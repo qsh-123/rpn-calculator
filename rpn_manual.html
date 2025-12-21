@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPN计算器使用说明书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            padding: 20px 50px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+        .header .info {
+            margin-top: 15px;
+            color: #95a5a6;
+            font-size: 0.9em;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 30px 0 15px;
+            font-size: 1.8em;
+        }
+        h2 {
+            color: #34495e;
+            margin: 25px 0 10px;
+            font-size: 1.4em;
+            padding-left: 10px;
+            border-left: 3px solid #3498db;
+        }
+        p {
+            line-height: 1.8;
+            color: #2c3e50;
+            margin: 10px 0;
+            font-size: 1.05em;
+        }
+        ul {
+            margin: 10px 0 10px 40px;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: #fff;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            line-height: 1.5;
+            font-family: "Consolas", "Monaco", monospace;
+        }
+        .code-block {
+            margin: 15px 0;
+        }
+        .code-block .lang {
+            background-color: #34495e;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RPN计算器使用说明书</h1>
+        <div class="subtitle">C++ 逆波兰表示法计算器完整指南</div>
+        <div class="info">作者：RPN计算器开发团队 | 日期：2025年09月</div>
+    </div>
+
+    <h1>一、安装和编译指南</h1>
+    <p>本章节详细介绍RPN计算器的环境准备、编译步骤和运行方式。</p>
+
+    <h2>1.1 环境准备</h2>
+    <p>运行RPN计算器需满足以下环境要求：</p>
+    <ul>
+        <li>操作系统：Windows 10+/Linux（Ubuntu 18.04+/CentOS 7+）/macOS 10.14+</li>
+        <li>C++编译器：GCC 7.0+ / Clang 8.0+ / MSVC 2019+</li>
+        <li>依赖库：C++标准库、数学库（libm，Linux/macOS需显式链接）</li>
+        <li>Nim环境（仅用于自动生成本文档，手动创建无需此环境）：Nim 1.6.0+ + Nimib 0.7.0+</li>
+    </ul>
+
+    <h2>1.2 编译步骤</h2>
+    <p>请按照以下步骤编译C++源代码：</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+# 1. 进入项目目录（替换为你的实际项目路径）
+cd ~/Desktop/rpn_calculator
+
+# 2. Linux/macOS 编译命令
+g++ rpn_calc.cpp -o rpn_calc -lm
+
+# 3. Windows（MinGW）编译命令
+g++ rpn_calc.cpp -o rpn_calc.exe -lm
+
+# 4. Visual Studio 编译命令（开发者命令提示符）
+cl rpn_calc.cpp /Fe:rpn_calc.exe
+        </pre>
+    </div>
+
+    <h2>1.3 运行方式</h2>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+# Linux/macOS 运行
+./rpn_calc
+
+# Windows 运行（MinGW/命令提示符）
+rpn_calc.exe
+
+# Windows 运行（双击打开）
+直接双击 rpn_calc.exe 文件即可
+        </pre>
+    </div>
+
+    <h1>二、基本使用示例</h1>
+    <p>以下示例覆盖常见的计算场景，帮助快速上手RPN计算器。</p>
+
+    <h2>2.1 简单四则运算</h2>
+    <p>示例1：计算 1 + 2 + 3 + (7 × 7)（常规四则运算组合）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 1 2 + 3 + 7 7 * +
+计算结果：55
+        </pre>
+    </div>
+
+    <p>示例2：计算 (10 - 4) × (3 + 2)（带括号的四则运算）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 10 4 - 3 2 + *
+计算结果：30
+        </pre>
+    </div>
+
+    <p>示例3：计算 100 ÷ (20 - 15)（除法与减法组合）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 100 20 15 - /
+计算结果：20
+        </pre>
+    </div>
+
+    <h2>2.2 高级功能使用</h2>
+    <p>示例4：计算 2^5（2的5次方，幂运算）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 2 5 ^
+计算结果：32
+        </pre>
+    </div>
+
+    <p>示例5：计算 √25（25的平方根）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 25 s
+计算结果：5
+        </pre>
+    </div>
+
+    <p>示例6：计算第10项斐波那契数（斐波那契数列功能）</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+> 10 f
+斐波那契计算结果：55
+        </pre>
+    </div>
+
+    <h1>三、所有支持的操作说明</h1>
+    <p>RPN计算器支持算术操作符和内置命令，详细说明如下。</p>
+
+    <h2>3.1 算术操作符</h2>
+    <table>
+        <tr>
+            <th>操作符</th>
+            <th>功能描述</th>
+            <th>操作数数量</th>
+            <th>使用示例</th>
+            <th>输出结果</th>
+        </tr>
+        <tr>
+            <td>+</td>
+            <td>加法运算（前数 + 后数）</td>
+            <td>2个</td>
+            <td>5 5 +</td>
+            <td>10</td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>减法运算（前数 - 后数）</td>
+            <td>2个</td>
+            <td>10 4 -</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td>*</td>
+            <td>乘法运算（前数 × 后数）</td>
+            <td>2个</td>
+            <td>6 5 *</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td>/</td>
+            <td>除法运算（前数 ÷ 后数）</td>
+            <td>2个</td>
+            <td>10 2 /</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>^</td>
+            <td>幂运算（前数的后数次方）</td>
+            <td>2个</td>
+            <td>2 5 ^</td>
+            <td>32</td>
+        </tr>
+        <tr>
+            <td>s</td>
+            <td>平方根运算（仅对栈顶元素生效）</td>
+            <td>1个</td>
+            <td>25 s</td>
+            <td>5</td>
+        </tr>
+    </table>
+
+    <h2>3.2 内置命令</h2>
+    <table>
+        <tr>
+            <th>命令</th>
+            <th>功能描述</th>
+            <th>使用示例</th>
+            <th>执行结果</th>
+        </tr>
+        <tr>
+            <td>clear</td>
+            <td>清空当前数字栈，重置栈状态</td>
+            <td>> clear</td>
+            <td>提示：栈已成功清空</td>
+        </tr>
+        <tr>
+            <td>stack</td>
+            <td>显示当前栈内所有元素（从栈底到栈顶）</td>
+            <td>> stack</td>
+            <td>当前栈内容（从栈底到栈顶）：5 10</td>
+        </tr>
+        <tr>
+            <td>f</td>
+            <td>计算斐波那契数列第n项（n从栈中弹出）</td>
+            <td>> 10 f</td>
+            <td>斐波那契计算结果：55</td>
+        </tr>
+        <tr>
+            <td>q/Q</td>
+            <td>退出计算器程序</td>
+            <td>> q</td>
+            <td>计算器已退出，感谢使用！</td>
+        </tr>
+    </table>
+
+    <h1>四、错误代码和异常说明</h1>
+    <p>计算器会捕获所有常见异常，并输出明确的错误信息，便于排查问题。</p>
+    <table>
+        <tr>
+            <th>错误类型</th>
+            <th>错误提示信息</th>
+            <th>产生原因</th>
+            <th>解决方案</th>
+        </tr>
+        <tr>
+            <td>栈空错误</td>
+            <td>错误：栈为空，无法弹出数字</td>
+            <td>执行运算时栈中数字数量不足（如仅输入1个数字就执行+运算）</td>
+            <td>确保输入足够的数字后再执行运算</td>
+        </tr>
+        <tr>
+            <td>除零错误</td>
+            <td>错误：除数不能为0</td>
+            <td>除法运算中右操作数为0（如 10 0 /）</td>
+            <td>修改除数为非零数值</td>
+        </tr>
+        <tr>
+            <td>表达式格式错误</td>
+            <td>错误：表达式格式无效，栈中剩余N个数字</td>
+            <td>输入的RPN表达式不合法（数字和操作符数量不匹配）</td>
+            <td>检查表达式格式，确保操作符与数字对应</td>
+        </tr>
+        <tr>
+            <td>操作符错误</td>
+            <td>错误：不支持的操作符/多字符操作符</td>
+            <td>输入了非支持的操作符（如 #）或多字符操作符（如 ++）</td>
+            <td>使用支持的单字符操作符</td>
+        </tr>
+        <tr>
+            <td>数值错误</td>
+            <td>错误：负数无法计算平方根/斐波那契项数不能为负数</td>
+            <td>平方根传入负数（如 -25 s）或斐波那契传入负项数（如 -5 f）</td>
+            <td>平方根传入非负数，斐波那契传入非负整数</td>
+        </tr>
+    </table>
+
+    <h1>五、完整示例输入输出</h1>
+    <p>以下是一次完整的交互式操作流程，展示计算器的全部核心功能。</p>
+    <div class="code-block">
+        <div class="lang">bash</div>
+        <pre>
+==================== C++ RPN 计算器 ====================
+使用说明：
+1. 输入逆波兰表达式（空格分隔数字和操作符，例：5 5 +）
+2. 支持算术操作符：+（加）、-（减）、*（乘）、/（除）
+3. 支持高级操作符：^（幂运算）、s（平方根）
+4. 内置命令：clear（清空栈）、stack（显示栈）、f（斐波那契）、q（退出）
+========================================================
+请输入表达式或命令：
+> 1 2 +
+计算结果：3
+> 3 4 *
+计算结果：12
+> 12 6 /
+计算结果：2
+> 2 3 ^
+计算结果：8
+> 8 2 +
+计算结果：10
+> 100 s
+计算结果：10
+> 10 f
+斐波那契计算结果：55
+> stack
+当前栈内容（从栈底到栈顶）：55 
+> clear
+提示：栈已成功清空
+> stack
+当前栈内容（从栈底到栈顶）：空
+> q
+计算器已退出，感谢使用！
+        </pre>
+    </div>
+
+    <h1>六、高级功能扩展与注意事项</h1>
+
+    <h2>6.1 高级功能说明</h2>
+    <ul>
+        <li>幂运算：支持浮点数幂运算（如 2 0.5 ^ 等价于√2，结果约为1.4142）</li>
+        <li>平方根运算：仅对栈顶元素生效，不影响其他栈内元素</li>
+        <li>斐波那契数列：遵循 F(0)=0、F(1)=1、F(n)=F(n-1)+F(n-2) 的定义</li>
+        <li>栈状态可视化：通过 stack 命令可实时查看栈内数据，便于调试复杂表达式</li>
+    </ul>
+
+    <h2>6.2 使用注意事项</h2>
+    <ul>
+        <li>逆波兰表达式规则：操作符跟在操作数之后，且需用空格分隔所有元素</li>
+        <li>操作数顺序：减法和除法是有序运算，先弹出的是右操作数（如 a b - 等价于 a - b）</li>
+        <li>浮点数支持：输入带小数点的数字（如 3.14）即可进行浮点数计算</li>
+        <li>异常处理：出现错误时，计算器会自动清空栈，不影响后续操作</li>
+    </ul>
+</body>
+</html>
+
